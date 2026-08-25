@@ -31,6 +31,24 @@ describe("BookList", () => {
     expect(screen.queryByText("Eloquent JavaScript")).not.toBeInTheDocument();
   });
 
+  it("paginates the book list", async () => {
+    const user = userEvent.setup();
+
+    render(<BookList />);
+
+    expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
+    expect(screen.getByText("Eloquent JavaScript")).toBeInTheDocument();
+    expect(screen.getByText("Learning React")).toBeInTheDocument();
+    expect(screen.queryByText("Refactoring UI")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Next" }));
+
+    expect(screen.getByText("Page 2 of 2")).toBeInTheDocument();
+    expect(screen.getByText("You Do Not Know JS Yet")).toBeInTheDocument();
+    expect(screen.getByText("Refactoring UI")).toBeInTheDocument();
+    expect(screen.queryByText("Eloquent JavaScript")).not.toBeInTheDocument();
+  });
+
   it("renders the empty state when no books match", async () => {
     const user = userEvent.setup();
 

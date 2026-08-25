@@ -28,16 +28,25 @@ const books: Book[] = [
     author: "Adam Wathan and Steve Schoger",
     isbn: "978-1732895802",
   },
+  {
+    id: 5,
+    title: "Avatar: The Last Airbender - The Rise of Kyoshi",
+    author: "Clive Misiko and F.C. Yee",
+    isbn: "978-1732895902",
+  }
 ];
 
 type BookListStatus = "loaded" | "loading" | "error";
+const BOOKS_PER_PAGE = 2;
 
 function BookList() {
   const [filterText, setFilterText] = useState("");
   const [status, setStatus] = useState<BookListStatus>("loaded");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleFilterChange = useCallback((value: string) => {
     setFilterText(value);
+    setCurrentPage(1);
   }, []);
 
   const filteredBooks = useMemo(() => {
@@ -51,6 +60,15 @@ function BookList() {
       book.title.toLowerCase().includes(normalizedFilter),
     );
   }, [filterText]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredBooks.length / BOOKS_PER_PAGE),
+  );
+  const paginatedBooks = filteredBooks.slice(
+    (currentPage - 1) * BOOKS_PER_PAGE,
+    currentPage * BOOKS_PER_PAGE,
+  );
 
   return (
     <section className="book-list" aria-labelledby="book-list-title">
@@ -90,11 +108,33 @@ function BookList() {
       )}
 
       {status === "loaded" && filteredBooks.length > 0 && (
-        <ul className="book-list__items">
-          {filteredBooks.map((book) => (
-            <BookListItem key={book.id} book={book} />
-          ))}
-        </ul>
+        <>
+          <ul className="book-list__items">
+            {paginatedBooks.map((book) => (
+              <BookListItem key={book.id} book={book} />
+            ))}
+          </ul>
+
+          <nav className="book-list__pagination" aria-label="Book list pagination">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => page - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => page + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </nav>
+        </>
       )}
     </section>
   );
