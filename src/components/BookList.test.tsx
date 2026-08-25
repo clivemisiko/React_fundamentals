@@ -14,7 +14,7 @@ describe("BookList", () => {
     expect(
       screen.getByRole("heading", { name: "Book List" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("4 books found")).toBeInTheDocument();
+    expect(screen.getByText("5 books found")).toBeInTheDocument();
     expect(screen.getByText("Eloquent JavaScript")).toBeInTheDocument();
     expect(screen.getByText("Learning React")).toBeInTheDocument();
   });
@@ -36,17 +36,25 @@ describe("BookList", () => {
 
     render(<BookList />);
 
-    expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
+    expect(screen.getByText("Page 1 of 3")).toBeInTheDocument();
     expect(screen.getByText("Eloquent JavaScript")).toBeInTheDocument();
     expect(screen.getByText("Learning React")).toBeInTheDocument();
     expect(screen.queryByText("Refactoring UI")).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Next" }));
 
-    expect(screen.getByText("Page 2 of 2")).toBeInTheDocument();
+    expect(screen.getByText("Page 2 of 3")).toBeInTheDocument();
     expect(screen.getByText("You Do Not Know JS Yet")).toBeInTheDocument();
     expect(screen.getByText("Refactoring UI")).toBeInTheDocument();
     expect(screen.queryByText("Eloquent JavaScript")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Next" }));
+
+    expect(screen.getByText("Page 3 of 3")).toBeInTheDocument();
+    expect(
+      screen.getByText("Avatar: The Last Airbender - The Rise of Kyoshi"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Refactoring UI")).not.toBeInTheDocument();
   });
 
   it("renders the empty state when no books match", async () => {
