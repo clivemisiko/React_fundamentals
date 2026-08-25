@@ -1,32 +1,68 @@
-# React + TypeScript + Vite
+# React Fundamentals: Gate 6
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+This project implements **Track C: React Frontend - C1 Component fundamentals** as a typed, filterable, paginated book list.
 
-Currently, two official plugins are available:
+## Run the project
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+The application can be opened at the local URL shown by Vite.
+
+## Gate requirements
+
+### Typed, composable components
+
+The feature is split into focused components:
+
+- `src/App.tsx` mounts the feature.
+- `src/components/BookList.tsx` owns filter, status, and pagination state.
+- `src/components/FilterInput.tsx` provides a controlled text input.
+- `src/components/BookListItem.tsx` renders one book from typed props.
+- `src/types.ts` defines the `Book` interface with `id`, `title`, `author`, and `isbn`.
+
+`FilterInput` and `BookListItem` have explicit TypeScript prop contracts. Books are rendered with `key={book.id}` so React can track list items consistently.
+
+### Correct state and interactions
+
+`BookList` uses separate state values for each responsibility:
+
+- `filterText` controls title filtering.
+- `status` switches between loaded, loading, and error views.
+- `currentPage` controls the visible page.
+
+Filtering is case-insensitive and trims whitespace. Changing the filter resets pagination to page 1. Pagination displays two books per page and disables Previous or Next at the appropriate boundary.
+
+The component renders the correct state through conditional rendering:
+
+- Loaded and matching books: renders the paginated list.
+- Loaded with no matches: shows `No books match your filter.`.
+- Loading: shows `Loading books...` and hides the list.
+- Error: shows an error message and hides the list.
+
+The loading and error states are currently demonstrated with static status buttons. They model the UI states but are not connected to a real network request.
+
+### React Testing Library coverage
+
+`src/components/BookList.test.tsx` tests:
+
+- Populated rendering and book counts
+- User typing and title filtering
+- Pagination from page 1 through page 3
+- Empty results
+- Loading state
+- Error state
+
+Tests use `user-event` for realistic typing and clicking, and accessible queries such as `getByRole`, `getByLabelText`, and `getByText`.
+
+## Verification commands
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
+The test suite currently contains six passing tests. Linting and the TypeScript/Vite production build also pass.
